@@ -12,7 +12,7 @@ with open('./input/3.txt', 'r') as lines:
         # Reset to top level
         level = top
         level["count"] += 1
-        top["length"] = len(line)-1
+        top["length"] = len(line)
 
 
         for bit in line:
@@ -31,24 +31,48 @@ with open('./input/3.txt', 'r') as lines:
 # calculate CO2 & O2 decimals realtime
 o2 = ["", top]
 co2 = ["", top]
-o2_done = False
-co2_done = False
+o2_keys = [True, True]
+co2_keys = [True, True]
 
 for index in range(0, top["length"]):
-    # check for keys -- if one doesn't exist, check the count of the other value
-    # if 1 -- we're done
-    # if more -- keep going
+    # #############################
+    #       Calculate Oxygen
+    # #############################
+    # Ensure 0 and 1 keys exist
+    o2_keys[0] = "0" in o2[1].keys()
+    o2_keys[1] = "1" in o2[1].keys()
 
-    o2_pivot = "1" if o2[1]["1"]["count"] >= o2[1]["0"]["count"] else "0"
+    # If we have both keys present, proceed as normal
+    if all(o2_keys):
+        o2_pivot = "1" if o2[1]["1"]["count"] >= o2[1]["0"]["count"] else "0"
+
+    # If not, select the only one present
+    elif any(o2_keys):
+        o2_pivot = "0" if o2_keys[0] else "1"
+
+    # Add the bit to the string and go to the next node
     o2[0] = f"{o2[0]}{o2_pivot}"
     o2[1] = o2[1][o2_pivot]
 
-    co2_pivot = "1" if co2[1]["1"]["count"] < co2[1]["0"]["count"] else "0"
-    co2[0] = f"{co2[0]}{co2_pivot}"
-    co2[1] = co2[1][co2_pivot] 
 
-    # CURRENT PROBLEM: If a key does not exist, we crash -- see the notes on line 39-41 for
-    #                   how to fix. 
+    # #############################
+    #   Calculate Carbon Dioxide
+    # #############################
+    # Ensure 0 and 1 keys exist
+    co2_keys[0] = "0" in co2[1].keys()
+    co2_keys[1] = "1" in co2[1].keys()
+
+    # If we have both keys present, proceed as normal
+    if all(co2_keys):
+        co2_pivot = "1" if co2[1]["1"]["count"] < co2[1]["0"]["count"] else "0"
+
+    # If not, select the only one present
+    elif any(co2_keys):
+        co2_pivot = "0" if co2_keys[0] else "1"
+
+    # Add the bit to the string and go to the next node
+    co2[0] = f"{co2[0]}{co2_pivot}"
+    co2[1] = co2[1][co2_pivot]
 
 print(f"O2: {int(o2[0], 2)}\t\tCO2: {int(co2[0], 2)}")
-print(f"Total value: {int(o2[0], 2) * int(co2[0], 2)}")
+print(f"Total value: {int(o2[0], 2) * int(co2[0], 2)}") 
